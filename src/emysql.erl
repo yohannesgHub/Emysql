@@ -231,7 +231,7 @@ add_pool(PoolId, Options) ->
 %%		Password = string()
 %%		Host = string()
 %%		Port = integer()
-%%		Database = string()
+%%		Database = string() | undefined
 %%		Encoding = string()
 %%		Result = {reply, {error, pool_already_exists}, state()} | {reply, ok, state() }
 %%
