@@ -96,7 +96,7 @@
 -module(emysql).
 
 -export([	start/0, stop/0,
-			add_pool/8, remove_pool/1, increment_pool_size/2, decrement_pool_size/2,
+			add_pool/2, add_pool/8, remove_pool/1, increment_pool_size/2, decrement_pool_size/2,
 			prepare/2,
 			execute/2, execute/3, execute/4, execute/5,
 			default_timeout/0,
@@ -185,6 +185,44 @@ modules() ->
 %%
 default_timeout() ->
 	emysql_app:default_timeout().
+
+%% @spec add_pool(PoolId, Options) -> Result
+%%		PoolId = atom()
+%%		Options = [option()]
+%%		option() = {size, integer()}
+%%		         | {user, string()}
+%%		         | {password, string()}
+%%		         | {host, string()}
+%%		         | {port, integer()}
+%%		         | {database, string() | undefined}
+%%		         | {encoding, atom()}
+%%		Result = {reply, {error, pool_already_exists}, state()} | {reply, ok, state() }
+%%
+%% @doc Synchronous call to the connection manager to add a pool.
+%%
+%% Options:
+%%
+%% size - pool size (defaults to 1)
+%% user - user to connect with (defaults to "")
+%% password - user password (defaults to "")
+%% host - host to connect to (defaults to "127.0.0.1")
+%% port - the port to connect to (defaults to 3306)
+%% database - the database to connect to (defaults to undefined)
+%% encoding - the connection encoding (defaults to utf8)
+%%
+%% === Implementation ===
+%%
+%% Refer to add_pool/8 for implementation details.
+
+add_pool(PoolId, Options) ->
+    Size = proplists:get_value(size, Options, 1),
+    User = proplists:get_value(user, Options, ""),
+    Password = proplists:get_value(password, Options, ""),
+    Host = proplists:get_value(host, Options, "127.0.0.1"),
+    Port = proplists:get_value(port, Options, 3306),
+    Database = proplists:get_value(database, Options, undefined),
+    Encoding = proplists:get_value(encoding, Options, utf8),
+    add_pool(PoolId, Size, User, Password, Host, Port, Database, Encoding).
 
 %% @spec add_pool(PoolId, Size, User, Password, Host, Port, Database, Encoding) -> Result
 %%		PoolId = atom()
