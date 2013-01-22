@@ -138,10 +138,10 @@ open_connections(Pool) ->
 			Pool
 	end.
 
-open_connection(#pool{pool_id=PoolId, host=Host, port=Port, user=User, password=Password, database=Database, encoding=Encoding}) ->
+open_connection(#pool{pool_id=PoolId, host=Host, port=Port, user=User, password=Password, database=Database, encoding=Encoding, connect_timeout=ConnectTimeout}) ->
 	 %-% io:format("~p open connection for pool ~p host ~p port ~p user ~p base ~p~n", [self(), PoolId, Host, Port, User, Database]),
 	 %-% io:format("~p open connection: ... connect ... ~n", [self()]),
-	case gen_tcp:connect(Host, Port, [binary, {packet, raw}, {active, false}]) of
+	case gen_tcp:connect(Host, Port, [binary, {packet, raw}, {active, false}], ConnectTimeout) of
 		{ok, Sock} ->
 			%-% io:format("~p open connection: ... got socket~n", [self()]),
 			Mgr = whereis(emysql_conn_mgr),

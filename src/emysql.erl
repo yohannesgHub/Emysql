@@ -96,7 +96,7 @@
 -module(emysql).
 
 -export([	start/0, stop/0,
-			add_pool/2, add_pool/8, remove_pool/1, increment_pool_size/2, decrement_pool_size/2,
+			add_pool/2, add_pool/8, add_pool/9, remove_pool/1, increment_pool_size/2, decrement_pool_size/2,
 			prepare/2,
 			execute/2, execute/3, execute/4, execute/5,
 			default_timeout/0,
@@ -196,6 +196,7 @@ default_timeout() ->
 %%		         | {port, integer()}
 %%		         | {database, string() | undefined}
 %%		         | {encoding, atom()}
+%%		         | {connect_timeout, integer()}
 %%		Result = {reply, {error, pool_already_exists}, state()} | {reply, ok, state() }
 %%
 %% @doc Synchronous call to the connection manager to add a pool.
@@ -209,6 +210,7 @@ default_timeout() ->
 %% port - the port to connect to (defaults to 3306)
 %% database - the database to connect to (defaults to undefined)
 %% encoding - the connection encoding (defaults to utf8)
+%% connect_timeout - millisecond timeout for connect (timeouts to infinity)
 %%
 %% === Implementation ===
 %%
@@ -222,9 +224,20 @@ add_pool(PoolId, Options) ->
     Port = proplists:get_value(port, Options, 3306),
     Database = proplists:get_value(database, Options, undefined),
     Encoding = proplists:get_value(encoding, Options, utf8),
-    add_pool(PoolId, Size, User, Password, Host, Port, Database, Encoding).
+    ConnectTimeout = proplists:get_value(connect_timeout, Options, infinity),
+    add_pool(PoolId, Size, User, Password, Host, Port, Database, Encoding, ConnectTimeout).
 
 %% @spec add_pool(PoolId, Size, User, Password, Host, Port, Database, Encoding) -> Result
+%%
+%% @doc Adds a pool using the default connect timeout (infinity).
+%%
+%% @equiv add_pool(PoolId, Size, User, Password, Host, Port, Database, Encoding, infinity)
+%% @end
+
+add_pool(PoolId, Size, User, Password, Host, Port, Database, Encoding) ->
+    add_pool(PoolId, Size, User, Password, Host, Port, Database, Encoding, infinity).
+
+%% @spec add_pool(PoolId, Size, User, Password, Host, Port, Database, Encoding, ConnectTimeout) -> Result
 %%		PoolId = atom()
 %%		Size = integer()
 %%		User = string()
@@ -232,6 +245,7 @@ add_pool(PoolId, Options) ->
 %%		Host = string()
 %%		Port = integer()
 %%		Database = string() | undefined
+%%		ConnectTimeout = integer()
 %%		Encoding = string()
 %%		Result = {reply, {error, pool_already_exists}, state()} | {reply, ok, state() }
 %%
@@ -244,7 +258,7 @@ add_pool(PoolId, Options) ->
 %% emysql_conn_mgr:add_pool() is translated into a blocking gen-server call.
 %% @end doc: hd feb 11
 
-add_pool(PoolId, Size, User, Password, Host, Port, Database, Encoding) ->
+add_pool(PoolId, Size, User, Password, Host, Port, Database, Encoding, ConnectTimeout) ->
 	Pool = #pool{
 		pool_id = PoolId,
 		size = Size,
@@ -253,7 +267,8 @@ add_pool(PoolId, Size, User, Password, Host, Port, Database, Encoding) ->
 		host = Host,
 		port = Port,
 		database = Database,
-		encoding = Encoding
+		encoding = Encoding,
+		connect_timeout = ConnectTimeout
 	},
 	Pool1 = emysql_conn:open_connections(Pool),
 	emysql_conn_mgr:add_pool(Pool1).
