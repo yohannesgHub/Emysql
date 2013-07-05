@@ -3,19 +3,19 @@
 %% Jacob Vorreuter <jacob.vorreuter@gmail.com>,
 %% Henning Diedrich <hd2010@eonblast.com>,
 %% Eonblast Corporation <http://www.eonblast.com>
-%% 
+%%
 %% Permission is  hereby  granted,  free of charge,  to any person
 %% obtaining  a copy of this software and associated documentation
 %% files (the "Software"),to deal in the Software without restric-
-%% tion,  including  without  limitation the rights to use,  copy, 
+%% tion,  including  without  limitation the rights to use,  copy,
 %% modify, merge,  publish,  distribute,  sublicense,  and/or sell
 %% copies  of the  Software,  and to  permit  persons to  whom the
-%% Software  is  furnished  to do  so,  subject  to the  following 
+%% Software  is  furnished  to do  so,  subject  to the  following
 %% conditions:
-%% 
+%%
 %% The above  copyright notice and this permission notice shall be
 %% included in all copies or substantial portions of the Software.
-%% 
+%%
 %% THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 %% EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 %% OF  MERCHANTABILITY,  FITNESS  FOR  A  PARTICULAR  PURPOSE  AND
@@ -237,7 +237,7 @@ close_connection(Conn) ->
 set_params(_, _, [], Result) -> Result;
 set_params(_, _, _, Error) when is_record(Error, error_packet) -> Error;
 set_params(Connection, Num, [Val|Tail], _) ->
-	NumBin = emysql_util:encode(Num, binary, Connection#emysql_connection.encoding), 
+	NumBin = emysql_util:encode(Num, binary, Connection#emysql_connection.encoding),
 	ValBin = emysql_util:encode(Val, binary, Connection#emysql_connection.encoding), % can trigger conversion
 	Packet = <<?COM_QUERY, "SET @", NumBin/binary, "=", ValBin/binary>>,
 	Result = emysql_tcp:send_and_recv_packet(Connection#emysql_connection.socket, Packet, 0),

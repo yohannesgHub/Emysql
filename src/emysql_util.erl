@@ -166,10 +166,10 @@ encode(Val, ReturnType) when is_atom(Val) ->
 encode(Val, ReturnType) ->
 	encode(Val, ReturnType, latin1).
 
-encode(null, list, _) -> 
+encode(null, list, _) ->
 	"null";
 
-encode(undefined, list, _) -> 
+encode(undefined, list, _) ->
 	"null";
 
 encode(null, binary, _)  ->
@@ -185,7 +185,7 @@ encode(Val, list, Encoding) when is_binary(Val) ->
 	quote(unicode:characters_to_list(Val, Encoding));
 
 
-encode(Val, binary, latin1) when is_list(Val) -> 
+encode(Val, binary, latin1) when is_list(Val) ->
 	list_to_binary(quote(Val));
 
 encode(Val, binary, Encoding) when is_list(Val) ->
@@ -197,13 +197,13 @@ encode(Val, binary, latin1) when is_binary(Val) ->
 	X = list_to_binary(quote(binary_to_list(Val))),
 	%-% io:format("encode latin-1 out: ~s = ~w ~n", [X, X]),
 	X;
-	
+
 encode(Val, binary, Encoding) when is_binary(Val) ->
 	case unicode:characters_to_list(Val,Encoding) of
 		{error,E1,E2} -> exit({invalid_utf8_binary, E1, E2});
 		{incomplete,E1,E2} -> exit({invalid_utf8_binary, E1, E2});
 	    List ->
-			unicode:characters_to_binary(quote(List),Encoding,Encoding)    	
+			unicode:characters_to_binary(quote(List),Encoding,Encoding)
     end;
 
 encode(Val, list, _) when is_list(Val) ->
@@ -262,7 +262,7 @@ two_digits(Num) ->
 	end.
 
 %% @doc Quote a string or binary value so that it can be included safely in a
-%% MySQL query. For the quoting, a binary is converted to a list and back. 
+%% MySQL query. For the quoting, a binary is converted to a list and back.
 %% For this, it's necessary to know the encoding of the binary.
 %% @spec quote(x()) -> x()
 %%       x() = list() | binary()
@@ -273,10 +273,10 @@ quote(String) when is_list(String) ->
 
 quote(String, _) when is_list(String) ->
 	quote(String);
-	
+
 quote(Any, Pool) when is_record(Any,pool) ->
 	quote(Any, Pool#pool.encoding);
-	
+
 quote(Bin, latin1) when is_binary(Bin) ->
 	list_to_binary(quote(binary_to_list(Bin)));
 
@@ -284,18 +284,18 @@ quote(Bin, Encoding) when is_binary(Bin) ->
 	case unicode:characters_to_list(Bin,Encoding) of
 		{error,E1,E2} -> exit({invalid_utf8_binary, E1, E2});
 	    List ->
-			unicode:characters_to_binary(quote(List),Encoding,Encoding)    	
+			unicode:characters_to_binary(quote(List),Encoding,Encoding)
     end.
 	% note:quote is a codepoint-wise inspection (each is a number) that also works for Unicode.
 
-%% @doc  Make MySQL-safe backslash escapes before 10, 13, \, 26, 34, 39. 
-%% @spec quote_loop(list()) -> list() 
+%% @doc  Make MySQL-safe backslash escapes before 10, 13, \, 26, 34, 39.
+%% @spec quote_loop(list()) -> list()
 %% @private
 %% @end
 %% hd/11,12
 quote_loop(List) ->
 	quote_loop(List, []).
-	
+
 quote_loop([], Acc) ->
 	Acc;
 
@@ -323,10 +323,10 @@ quote_loop([26 | Rest], Acc) ->
 quote_loop([C | Rest], Acc) ->
 	quote_loop(Rest, [C | Acc]).
 
-%% UTF-8 is designed in such a way that ISO-latin-1 characters with 
+%% UTF-8 is designed in such a way that ISO-latin-1 characters with
 %% numbers beyond the 7-bit ASCII range are seldom considered valid
-%% when decoded as UTF-8. Therefore one can usually use heuristics 
-%% to determine if a file is in UTF-8 or if it is encoded in 
+%% when decoded as UTF-8. Therefore one can usually use heuristics
+%% to determine if a file is in UTF-8 or if it is encoded in
 %% ISO-latin-1 (one byte per character) encoding. The unicode module
 %% can be used to determine if data can be interpreted as UTF-8.
 %% Source: http://www.erlang.org/doc/apps/stdlib/unicode_usage.html
@@ -350,7 +350,7 @@ any_to_binary(L) when is_list(L) ->
 
 to_binary(L,_) when is_binary(L) ->
 	L;
-	
+
 to_binary(L,latin1) when is_list(L) ->
 	list_to_binary(L);
 

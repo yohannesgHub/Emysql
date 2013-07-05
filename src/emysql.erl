@@ -3,19 +3,19 @@
 %% Jacob Vorreuter <jacob.vorreuter@gmail.com>
 %% Henning Diedrich <hd2010@eonblast.com>
 %% Eonblast Corporation <http://www.eonblast.com>
-%% 
+%%
 %% Permission is  hereby  granted,  free of charge,  to any person
 %% obtaining  a copy of this software and associated documentation
 %% files (the "Software"),to deal in the Software without restric-
-%% tion,  including  without  limitation the rights to use,  copy, 
+%% tion,  including  without  limitation the rights to use,  copy,
 %% modify, merge,  publish,  distribute,  sublicense,  and/or sell
 %% copies  of the  Software,  and to  permit  persons to  whom the
-%% Software  is  furnished  to do  so,  subject  to the  following 
+%% Software  is  furnished  to do  so,  subject  to the  following
 %% conditions:
-%% 
+%%
 %% The above  copyright notice and this permission notice shall be
 %% included in all copies or substantial portions of the Software.
-%% 
+%%
 %% THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 %% EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 %% OF  MERCHANTABILITY,  FITNESS  FOR  A  PARTICULAR  PURPOSE  AND
@@ -26,32 +26,32 @@
 %% OTHER DEALINGS IN THE SOFTWARE.
 
 
-%% @doc The main Emysql module. 
+%% @doc The main Emysql module.
 %%
 %% Emysql is implemented as an Erlang
 %% <b>application</b>. The term has a special meaning in Erlang, see
 %% [http://www.erlang.org/doc/design_principles/applications.html]
 %%
-%% This module exports functions to: 
+%% This module exports functions to:
 %% <li><b>start</b> and <b>stop</b> the driver (the 'application'),</li>
 %% <li><b>execute</b> queries or prepared statements,</li>
 %% <li><b>prepare</b> such statements,</li>
 %% <li>change the <b>connection pool</b> size.</li>
-%% 
+%%
 %% === Sample ===
 %% ```
 %% 	-module(sample).
 %%	-export([run/0]).
-%%	
+%%
 %%	run() ->
-%%	
+%%
 %%		crypto:start(),
 %%		emysql:start(),
-%%	
+%%
 %%		emysql:add_pool(hello_pool, 1,
 %%			"hello_username", "hello_password", "localhost", 3306,
 %%			"hello_database", utf8),
-%%	
+%%
 %%		emysql:execute(hello_pool,
 %%			<<"INSERT INTO hello_table SET hello_text = 'Hello World!'">>),
 %%
@@ -69,26 +69,26 @@
 %%
 %% start(), stop(), modules() and default_timeout() are one-line 'fascades':
 %% ```
-%% 	start() -> application:start(emysql).                
-%% 	stop() -> application:stop(emysql).                  
-%% 	modules() -> emysql_app:modules().                   
-%% 	default_timeout() -> emysql_app:default_timeout().   
+%% 	start() -> application:start(emysql).
+%% 	stop() -> application:stop(emysql).
+%% 	modules() -> emysql_app:modules().
+%% 	default_timeout() -> emysql_app:default_timeout().
 %% '''
 %%
 %% execute() and prepare() are the bulk of the source
 %% of this module. A lot gets repeated for default values in lesser arities.
 %% The quintessential execute however is this, in execute/2:
 %% ```
-%% 	execute(PoolId, Query, Args, Timeout) 
+%% 	execute(PoolId, Query, Args, Timeout)
 %%		when (is_list(Query) orelse is_binary(Query)) andalso is_list(Args) andalso is_integer(Timeout) ->
-%%		
-%%			Connection = 
+%%
+%%			Connection =
 %%				emysql_conn_mgr:wait_for_connection(PoolId),
 %%				monitor_work(Connection, Timeout, {emysql_conn, execute, [Connection, Query, Args]});
 %% '''
 %% As all executions, it uses the monitor_work/3 function to create a process to
 %% asynchronously handle the execution.
-%% 
+%%
 %% The pool-related functions execute brief operations using the primitive
 %% functions exported by `emysql_conn_mgr' and `emysql_conn_mgr'.
 %% @end doc: hd feb 11
@@ -100,7 +100,7 @@
 			prepare/2,
 			execute/2, execute/3, execute/4, execute/5,
 			default_timeout/0,
-			modules/0	
+			modules/0
 		]).
 
 % for record and constant defines
@@ -122,7 +122,7 @@
 %% callback function start/2 in the module, and with the start argument,
 %% defined by the mod key in the .app file.
 %%
-%% application:start(Application) is the same as calling 
+%% application:start(Application) is the same as calling
 %% application:start(Application, temporary). If a temporary application
 %% terminates, this is reported but no other applications are terminated.
 %%
@@ -134,7 +134,7 @@ start() ->
 
 %% @spec stop() -> ok
 %% @doc Stop the Emysql application.
-%% 
+%%
 %% Simply calls `application:stop(emysql).'
 %%
 %% === From the Erlang Manual ===
@@ -179,7 +179,7 @@ modules() ->
 %%
 %% === Implementation ===
 %%
-%% src/emysql.app.src is a template for the emysql app file from which 
+%% src/emysql.app.src is a template for the emysql app file from which
 %% ebin/emysql.app is created during building, by a sed command in 'Makefile'.
 %% @end doc: hd feb 11
 %%
@@ -253,7 +253,7 @@ add_pool(PoolId, Size, User, Password, Host, Port, Database, Encoding) ->
 %%
 %% === Implementation ===
 %%
-%% Creates a pool record, opens n=Size connections and calls 
+%% Creates a pool record, opens n=Size connections and calls
 %% emysql_conn_mgr:add_pool() to make the pool known to the pool management.
 %% emysql_conn_mgr:add_pool() is translated into a blocking gen-server call.
 %% @end doc: hd feb 11
@@ -302,7 +302,7 @@ remove_pool(PoolId) ->
 %%
 %% Opens connections and then adds them to the pool by a call to
 %% emysql_conn_mgr:add_connections().
-%% 
+%%
 %% That this function exposes the State and possibly pool_not_found
 %% seems to be inconsistent with decrement_pool_size(), which invariably
 %% returns 'ok'.
@@ -320,19 +320,19 @@ increment_pool_size(PoolId, Num) when is_integer(Num) ->
 %%
 %% This reduces the connections by up to n=By, but it only drops and closes available
 %% connections that are not in use at the moment that this function is called. Connections
-%% that are waiting for a server response are never dropped. In heavy duty, this function 
+%% that are waiting for a server response are never dropped. In heavy duty, this function
 %% may thus do nothing.
 %%
 %% If 'By' is higher than the amount of connections or the amount of available connections,
-%% exactly all available connections are dropped and closed. 
+%% exactly all available connections are dropped and closed.
 %%
 %%
 %% === Implementation ===
 %%
 %% First gets a list of target connections from emysql_conn_mgr:remove_connections(), then
-%% relies on emysql_conn:close_connection(Conn) for the proper closing of connections. 
+%% relies on emysql_conn:close_connection(Conn) for the proper closing of connections.
 %% @end doc: hd feb 11
-%% 
+%%
 
 decrement_pool_size(PoolId, Num) when is_integer(Num) ->
 	Conns = emysql_conn_mgr:remove_connections(PoolId, Num),
@@ -344,40 +344,40 @@ decrement_pool_size(PoolId, Num) when is_integer(Num) ->
 %%		Statement = binary() | string()
 %%
 %% @doc Prepare a statement.
-%% 
+%%
 %% The atom given by parameter 'StmtName' is bound to the SQL string
 %% 'Statement'. Calling ``execute(<Pool>, StmtName, <ParamList>)'' executes the
 %% statement with parameters from ``<ParamList>''.
 %%
-%% This is not a mySQL prepared statement, but an implementation on the side of 
+%% This is not a mySQL prepared statement, but an implementation on the side of
 %% Emysql.
 %%
 %% === Sample ===
 %% ```
 %% -module(sample).
 %% -export([run/0]).
-%% 
+%%
 %% run() ->
-%% 
+%%
 %% 	application:start(sasl),
 %% 	crypto:start(),
 %% 	application:start(emysql),
-%% 
+%%
 %% 	emysql:add_pool(hello_pool, 1,
 %% 		"hello_username", "hello_password", "localhost", 3306,
 %% 		"hello_database", utf8),
-%% 
+%%
 %% 	emysql:execute(hello_pool,
 %% 		<<"INSERT INTO hello_table SET hello_text = 'Hello World!'">>),
-%% 
-%% 	emysql:prepare(hello_stmt, 
+%%
+%% 	emysql:prepare(hello_stmt,
 %% 		<<"SELECT * from hello_table WHERE hello_text like ?">>),
-%% 
+%%
 %% 	Result = emysql:execute(hello_pool, hello_stmt, ["Hello%"]),
-%% 
+%%
 %% 	 io:format("~n~s~n", [string:chars($-,72)]),
 %% 	 io:format("~p~n", [Result]),
-%% 
+%%
 %%     ok.
 %% '''
 %% Output:
@@ -389,11 +389,11 @@ decrement_pool_size(PoolId, Num) when is_integer(Num) ->
 %%                        60,0,0}],
 %%                [[<<"Hello World!">>]],
 %%                <<>>}
-%% ''' 
+%% '''
 %% === Implementation ===
 %%
 %% Hands parameters over to emysql_statements:add/2:
-%% ``emysql_statements:add(StmtName, Statement).'', which calls 
+%% ``emysql_statements:add(StmtName, Statement).'', which calls
 %% ``handle_call({add, StmtName, Statement}, _From, State)''.
 %%
 %% The statement is there added to the Emysql statement GB tree:
@@ -459,7 +459,7 @@ execute(PoolId, StmtName) when is_atom(StmtName) ->
 %%
 %% @doc Execute a query, prepared statement or a stored procedure.
 %%
-%% Same as `execute(PoolId, Query, Args, default_timeout())' 
+%% Same as `execute(PoolId, Query, Args, default_timeout())'
 %% or `execute(PoolId, Query, [], Timeout)'.
 %%
 %% Timeout is the query timeout in milliseconds or the atom infinity.
@@ -557,10 +557,10 @@ execute(PoolId, StmtName, Args, Timeout) when is_atom(StmtName), is_list(Args) a
 %% The result is a list for stored procedure execution >= MySQL 4.1
 %%
 %% All other execute function eventually call this function.
-%% 
+%%
 %% @see execute/2.
-%% @see execute/3. 
-%% @see execute/4. 
+%% @see execute/3.
+%% @see execute/4.
 %% @see prepare/2.
 %% @end doc: hd feb 11
 %%
@@ -594,7 +594,7 @@ execute(PoolId, StmtName, Args, Timeout, nonblocking) when is_atom(StmtName), is
 %%
 %% @doc Execute a query, prepared statement or a stored procedure.
 %%
-%% Same as `execute(PoolId, Query, Args, default_timeout())' 
+%% Same as `execute(PoolId, Query, Args, default_timeout())'
 %% or `execute(PoolId, Query, [], Timeout)'.
 %%
 %% Timeout is the query timeout in milliseconds or the atom infinity.
@@ -606,8 +606,8 @@ execute(PoolId, StmtName, Args, Timeout, nonblocking) when is_atom(StmtName), is
 %% @see execute/4.
 %% @see execute/5.
 %% @see prepare/2.
-%% 
-%% @private 
+%%
+%% @private
 %% @end doc: hd feb 11
 %%
 monitor_work(Connection, Timeout, {M,F,A}) when is_record(Connection, emysql_connection) ->
@@ -631,16 +631,16 @@ monitor_work(Connection, Timeout, {M,F,A}) when is_record(Connection, emysql_con
 					[_OldConn | RestArgs] = A,
 					NewA = [NewConnection | RestArgs],
 					monitor_work(NewConnection, Timeout, {M, F, NewA});
-				{error, FailedReset} -> 
+				{error, FailedReset} ->
 					exit({connection_down, {and_conn_reset_failed, FailedReset}})
-			end;			
+			end;
 		{'DOWN', Mref, process, Pid, Reason} ->
 			%% if the process dies, reset the connection
 			%% and re-throw the error on the current pid.
 			%% catch if re-open fails and also signal it.
             %-% io:format("monitor_work: ~p DOWN ~p -> exit~n", [Pid, Reason]),
 			case emysql_conn:reset_connection(emysql_conn_mgr:pools(), Connection, pass) of
-				{error,FailedReset} -> 
+				{error,FailedReset} ->
 					exit({Reason, {and_conn_reset_failed, FailedReset}});
 				_ -> exit({Reason, {}})
 			end;
@@ -658,7 +658,7 @@ monitor_work(Connection, Timeout, {M,F,A}) when is_record(Connection, emysql_con
             %-% io:format("monitor_work: ~p TIMEOUT -> demonitor, reset connection, exit~n", [Pid]),
 			erlang:demonitor(Mref),
 			case emysql_conn:reset_connection(emysql_conn_mgr:pools(), Connection, pass) of
-				{error, FailedReset} -> 
+				{error, FailedReset} ->
 					exit({mysql_timeout, Timeout, {and_conn_reset_failed, FailedReset}});
 				_ -> exit({mysql_timeout, Timeout, {}})
 			end

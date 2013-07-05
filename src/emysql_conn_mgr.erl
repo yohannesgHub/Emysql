@@ -4,19 +4,19 @@
 %% Jacob Vorreuter <jacob.vorreuter@gmail.com>
 %% Henning Diedrich <hd2010@eonblast.com>
 %% Eonblast Corporation <http://www.eonblast.com>
-%% 
+%%
 %% Permission is  hereby  granted,  free of charge,  to any person
 %% obtaining  a copy of this software and associated documentation
 %% files (the "Software"),to deal in the Software without restric-
-%% tion,  including  without  limitation the rights to use,  copy, 
+%% tion,  including  without  limitation the rights to use,  copy,
 %% modify, merge,  publish,  distribute,  sublicense,  and/or sell
 %% copies  of the  Software,  and to  permit  persons to  whom the
-%% Software  is  furnished  to do  so,  subject  to the  following 
+%% Software  is  furnished  to do  so,  subject  to the  following
 %% conditions:
-%% 
+%%
 %% The above  copyright notice and this permission notice shall be
 %% included in all copies or substantial portions of the Software.
-%% 
+%%
 %% THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 %% EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 %% OF  MERCHANTABILITY,  FITNESS  FOR  A  PARTICULAR  PURPOSE  AND
@@ -35,7 +35,7 @@
 -export([pools/0, add_pool/1, remove_pool/1,
 		add_connections/2, remove_connections/2,
 		lock_connection/1, wait_for_connection/1,
-		pass_connection/1, 
+		pass_connection/1,
 		replace_connection_as_available/2, replace_connection_as_locked/2,
 		find_pool/2]).
 
@@ -79,7 +79,7 @@ wait_for_connection(PoolId)->
 		unavailable ->
             %-% io:format("~p is queued~n", [self()]),
 			receive
-				{connection, Connection} -> 
+				{connection, Connection} ->
                     %-% io:format("~p gets a connection after waiting in queue~n", [self()]),
     				Connection
 			after lock_timeout() ->
@@ -408,7 +408,7 @@ pass_on_or_queue_as_available(State, Connection) ->
 				{ok, StateNow}
 		end;
 
-		%% pool not found    
+		%% pool not found
 		undefined ->
 			{{error, pool_not_found}, State}
 	end.
@@ -421,10 +421,10 @@ lock_timeout() ->
 %% connection.
 receive_connection_not_waiting() ->
 	receive
-		{connection, Connection} -> 
+		{connection, Connection} ->
 			%%-% io:format("~p gets a connection after timeout in queue~n", [self()]),
 			Connection
-	after 
+	after
 		%% This should never happen, as we should only be here if we had been sent a connection
 		lock_timeout() ->
 			%%-% io:format("~p gets no connection and times out again -> EXIT~n~n", [self()]),

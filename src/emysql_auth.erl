@@ -53,21 +53,21 @@ recv_greeting(Sock) ->
 	%-% io:format("~p recv_greeting ... received ...~n", [self()]),
 	case GreetingPacket#packet.data of
 		<<255, _/binary>> ->
-			% io:format("error: ", []), 
+			% io:format("error: ", []),
 			{#error_packet{
 				code = Code,
 				msg = Msg
 			},_} = emysql_tcp:response(Sock, GreetingPacket),
-			% io:format("exit: ~p~n-------------~p~n", [Code, Msg]), 
+			% io:format("exit: ~p~n-------------~p~n", [Code, Msg]),
 			exit({Code, Msg});
 		<<ProtocolVersion:8/integer, Rest1/binary>> ->
-			% io:format("prl v: ~p~n-------------~p~n", [ProtocolVersion, Rest1]), 
+			% io:format("prl v: ~p~n-------------~p~n", [ProtocolVersion, Rest1]),
 			{ServerVersion, Rest2} = emysql_util:asciz(Rest1),
 			% io:format("srv v: ~p~n-------------~p~n", [ServerVersion, Rest2]),
 			<<ThreadID:32/little, Rest3/binary>> = Rest2,
 			% io:format("tread id: ~p~n-------------~p~n", [ThreadID, Rest3]),
 			{Salt, Rest4} = emysql_util:asciz(Rest3),
-			% io:format("salt: ~p~n-------------~p~n", [Salt, Rest4]), 
+			% io:format("salt: ~p~n-------------~p~n", [Salt, Rest4]),
 			<<ServerCaps:16/little, Rest5/binary>> = Rest4,
 			% io:format("caps: ~p~n-------------~p~n", [ServerCaps, Rest5]),
 			<<ServerLanguage:8/little,
